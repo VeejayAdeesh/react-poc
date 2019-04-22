@@ -15,15 +15,17 @@ const buildControls = (props) => {
             {burgerControl.map((controlkey)=>{
                 return <BuildControl key={controlkey.label}
                          labelName={controlkey.label}
-                         addIngredient={()=>{
-                            console.log("Clicked Event"); 
-                            props.ingredientAdd(controlkey.key)}
-                        }/>
-            })}
+                         addIngredient={() =>props.ingredientAdd(controlkey.key)}
+                         removeIngredient={() => props.ingredientRemove(controlkey.key)}
+                         disabledButton={props.disabled[controlkey.key]}/>
+                           
+                            
+                    })}
         </div>
     )
  
 }   
+
 
 
 export default buildControls;
