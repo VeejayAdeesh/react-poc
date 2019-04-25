@@ -2,6 +2,8 @@ import React, {Component} from 'react';
 import Aux from '../../hoc/Auxillary';
 import Burger from '../../components/Burger/Burger';
 import BurgerControls from '../../components/BuildControls/BuildControls';
+import Modal from '../../components/UI/Modal/Modal'
+import OrderSummary from '../../components/Burger/OrderSummary/OrderSummary'
 
 const INGREDIENT_PRICE = {
     salad: 0.4,
@@ -20,8 +22,18 @@ class BurgerBuilder extends Component{
             bacon: 0
         },
         basePrice: 4,
-        totalPrice: 0
+        purchaseable: false
     };
+
+    purchaseableHandler(ingredients){
+        let orderCount = Object.keys(ingredients).map(igkey =>{
+                return ingredients[igkey]
+        }).reduce((acc,cur)=>{
+            return acc+=cur
+        },0)
+        this.setState({purchaseable:orderCount>0})
+        console.log(orderCount);
+    }
 
     addIngredientHandler=(type)=>{
         let newCount = this.state.ingredients[type] + 1;
@@ -30,29 +42,30 @@ class BurgerBuilder extends Component{
        // console.log("New Price ",newPrice);
         let oldState = {...this.state};
         oldState.ingredients[type] = newCount;
-        oldState.totalPrice = newPrice;
+        oldState.basePrice = newPrice;
         this.setState({ingredients: oldState.ingredients,
-            basePrice: 4, 
-            totalPrice:oldState.totalPrice});
+            basePrice: oldState.basePrice, 
+            });
+        this.purchaseableHandler(oldState.ingredients);
     }
 
     removeIngredientHandler=(type)=>{
-        console.log(type);
+        //console.log(type);
         let newCount = this.state.ingredients[type] - 1;
         if(newCount < 0){
             console.log("newCount is zero");
             return;
         }
-        console.log("New Count ",newCount);
-        let newPrice = this.state.totalPrice - INGREDIENT_PRICE[type];
-        console.log("New Price ",newPrice);
+        //console.log("New Count ",newCount);
+        let newPrice = this.state.basePrice - INGREDIENT_PRICE[type];
+       // console.log("New Price ",newPrice);
         let oldState = {...this.state};
         oldState.ingredients[type] = newCount;
-        oldState.totalPrice = newPrice;
+        oldState.basePrice = newPrice;
         this.setState({ingredients: oldState.ingredients,
-            basePrice: 4,
-            totalPrice: oldState.totalPrice
+            basePrice: oldState.basePrice
         });
+        this.purchaseableHandler(oldState.ingredients);
     }
 
     render(){
@@ -63,10 +76,15 @@ class BurgerBuilder extends Component{
         console.log("Disable Function",disableButton);
         return (
             <Aux>
+                <Modal>
+                    <OrderSummary orderdetails={this.state.ingredients}/>
+                </Modal>
                 <Burger ingredient={this.state.ingredients} />
                 <BurgerControls ingredientAdd={this.addIngredientHandler} 
                     ingredientRemove={this.removeIngredientHandler}
                     disabled={disableButton}
+                    price={this.state.basePrice}
+                    orderButton={this.state.purchaseable}
                     />
             </Aux>
         );
