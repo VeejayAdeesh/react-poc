@@ -22,8 +22,13 @@ class BurgerBuilder extends Component{
             bacon: 0
         },
         basePrice: 4,
-        purchaseable: false
+        purchaseable: false,
+        purchasing: false
     };
+
+    purchasingHandler = ()=>{
+        this.setState({purchasing: true})
+    }
 
     purchaseableHandler(ingredients){
         let orderCount = Object.keys(ingredients).map(igkey =>{
@@ -76,7 +81,7 @@ class BurgerBuilder extends Component{
         console.log("Disable Function",disableButton);
         return (
             <Aux>
-                <Modal>
+                <Modal show={this.state.purchasing}>
                     <OrderSummary orderdetails={this.state.ingredients}/>
                 </Modal>
                 <Burger ingredient={this.state.ingredients} />
@@ -85,6 +90,7 @@ class BurgerBuilder extends Component{
                     disabled={disableButton}
                     price={this.state.basePrice}
                     orderButton={this.state.purchaseable}
+                    orderModal={this.purchasingHandler}
                     />
             </Aux>
         );
