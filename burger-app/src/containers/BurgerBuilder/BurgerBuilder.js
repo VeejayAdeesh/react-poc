@@ -30,6 +30,18 @@ class BurgerBuilder extends Component{
         this.setState({purchasing: true})
     }
 
+
+    purchaseableCancelHandler = () =>{
+        console.log("Event Fired");
+        this.setState({purchasing: false})
+    }
+
+
+    purchaseableContinueHandler = () => {
+        alert('You Continue Order!!')
+    }
+
+
     purchaseableHandler(ingredients){
         let orderCount = Object.keys(ingredients).map(igkey =>{
                 return ingredients[igkey]
@@ -81,8 +93,11 @@ class BurgerBuilder extends Component{
         console.log("Disable Function",disableButton);
         return (
             <Aux>
-                <Modal show={this.state.purchasing}>
-                    <OrderSummary orderdetails={this.state.ingredients}/>
+                <Modal show={this.state.purchasing} clickEvent={this.purchaseableCancelHandler}>
+                    <OrderSummary orderdetails={this.state.ingredients}
+                    cancelOrder={this.purchaseableCancelHandler}
+                    continueOrder={this.purchaseableContinueHandler}
+                    totalPrice={this.state.basePrice}/>
                 </Modal>
                 <Burger ingredient={this.state.ingredients} />
                 <BurgerControls ingredientAdd={this.addIngredientHandler} 
