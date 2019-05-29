@@ -13,7 +13,6 @@ const sideDrawer = (props) => {
     }
     else{
         sideDrawerClasses = [classes.SideDrawer, classes.Close]
-        console.log(sideDrawerClasses);
     }
     return (
         <Aux>
