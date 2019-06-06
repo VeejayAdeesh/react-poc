@@ -46,23 +46,34 @@ class BurgerBuilder extends Component {
 
 
     purchaseableContinueHandler = () => {
+        console.log(this.props);
         //alert('You Continue Order!!')
-        this.setState({ loading: true })
-        let order = {
-            ingredients: this.state.ingredients,
-            price: this.state.basePrice,
-            customer: {
-                name: 'Veejay',
-                sex: 'male',
-                address: {
-                    streetName: 'Test Street',
-                    zipcode: 600000,
-                    country: 'India'
-                }
-            }
+        // this.setState({ loading: true })
+        // let order = {
+        //     ingredients: this.state.ingredients,
+        //     price: this.state.basePrice,
+        //     customer: {
+        //         name: 'Veejay',
+        //         sex: 'male',
+        //         address: {
+        //             streetName: 'Test Street',
+        //             zipcode: 600000,
+        //             country: 'India'
+        //         }
+        //     }
+        // }
+        // axios.post('/orders.json', order).then(response => this.setState({ loading: false, purchasing: false }))
+        //     .catch(error => this.setState({ loading: false, purchasing: false }))
+        const querparam=[]
+        for(let i in this.state.ingredients){
+            querparam.push(encodeURIComponent(i)+'='+encodeURIComponent(this.state.ingredients[i]))
         }
-        axios.post('/orders.json', order).then(response => this.setState({ loading: false, purchasing: false }))
-            .catch(error => this.setState({ loading: false, purchasing: false }))
+        querparam.push('totalPrice='+this.state.basePrice)
+        const queryString = querparam.join('&')
+        this.props.history.push({
+            pathname: '/checkout',
+            search: '?'+queryString
+        })
     }
 
 
