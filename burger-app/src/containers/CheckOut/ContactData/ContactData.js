@@ -1,12 +1,12 @@
-import React,{Component} from 'react'
+import React, { Component } from 'react'
 import classes from './ContactData.css'
 import Button from '../../../components/UI/Button/Button'
 import axios from '../../../axios-order'
 import Input from '../../../components/UI/Input/Input'
 
-class ContactData extends Component{
+class ContactData extends Component {
 
-    state ={
+    state = {
         orderForm: {
             name: {
                 elementType: 'input',
@@ -14,7 +14,14 @@ class ContactData extends Component{
                     type: 'text',
                     placeholder: 'Your Name'
                 },
-                value: ''
+                value: '',
+                validationRule: {
+                    isRequired: true,
+                    minLength: 5,
+                    maxLength: 5
+                },
+                isValid: true,
+                touched: false
             },
             street: {
                 elementType: 'input',
@@ -22,7 +29,14 @@ class ContactData extends Component{
                     type: 'text',
                     placeholder: 'Street Name'
                 },
-                value: ''
+                value: '',
+                validationRule: {
+                    isRequired: true,
+                    minLength: 5,
+                    maxLength: 5
+                },
+                isValid: true,
+                touched: false
             },
             zipcode: {
                 elementType: 'input',
@@ -30,7 +44,14 @@ class ContactData extends Component{
                     type: 'text',
                     placeholder: 'ZIP Code'
                 },
-                value: ''
+                value: '',
+                validationRule: {
+                    isRequired: true,
+                    minLength: 5,
+                    maxLength: 5
+                },
+                isValid: true,
+                touched: false
             },
             country: {
                 elementType: 'input',
@@ -38,61 +59,117 @@ class ContactData extends Component{
                     type: 'text',
                     placeholder: 'Country'
                 },
-                value: ''
+                value: '',
+                validationRule: {
+                    isRequired: true,
+                    minLength: 5,
+                    maxLength: 5
+                },
+                isValid: true,
+                touched: false
             },
             deliverymethod: {
                 elementType: 'select',
                 elementConfig: {
                     option: [
-                        {value: 'fastest', displayValue: 'Fastest'},
-                        {value: 'cheapest', displayValue: 'Cheapest'}
+                        { value: 'fastest', displayValue: 'Fastest' },
+                        { value: 'cheapest', displayValue: 'Cheapest' }
                     ],
                     placeholder: 'Delivery Method'
                 },
-                value:''
+                value: 'cheapest',
+                isValid: true
             }
         },
+        formValid: false,
         ingredients: null,
-        totalPrice:0
+        totalPrice: 0
 
     }
 
-    componentWillMount(){
-        console.log("Contact Data ",this.props)
-        let ingredients=this.props.ingredients
-        let totalPrice=this.props.totalPrice
-        this.setState({ingredients: ingredients, totalPrice:totalPrice})
+    componentWillMount() {
+        console.log("Contact Data ", this.props)
+        let ingredients = this.props.ingredients
+        let totalPrice = this.props.totalPrice
+        this.setState({ ingredients: ingredients, totalPrice: totalPrice })
     }
 
-    orderHandler = ()=> {
-        
-        let order={...this.state}
-        axios.post('/orders.json', order).then(response => 
+    orderHandler = (event) => {
+        event.preventDefault()
+        const formValueUpdate = {}
+        for(let fieldIdentifier in this.state.orderForm){
+            formValueUpdate[fieldIdentifier] = this.state.orderForm[fieldIdentifier].value
+            console.log("Form Value Update",formValueUpdate)
+        }
+        let order = {
+            ingredients: this.state.ingredients,
+            totalPrice: this.state.totalPrice,
+            orderData: formValueUpdate
+            
+         }
+        axios.post('/orders.json', order).then(response =>
             this.setState({ loading: false, purchasing: false }))
-             .catch(error => this.setState({ loading: false, purchasing: false }))
-             this.props.history.push("/")
+            .catch(error => this.setState({ loading: false, purchasing: false }))
+        this.props.history.push("/")
 
     }
 
-    render(){
+    checkValidation(rules, fieldValue){
+        let isValid = true
+        if(rules !== undefined){
+            if(rules.isRequired){
+                isValid = fieldValue.trim() !=='' && isValid
+            }
+            if(rules.minLength){
+                isValid = fieldValue.length >=5 && isValid 
+            }
+            if(rules.maxLength){
+                isValid = fieldValue.length <= 10 && isValid
+            }
+        console.log(isValid)
+        return isValid
+        }
+        else{
+            return isValid;
+        }
+    }
+
+    inputValueHandler = (event, inputIdentifier) => {
+        let formValid = true;
+        const updateField = {...this.state.orderForm}
+        const updateValueField = {...updateField[inputIdentifier]}
+        updateValueField.value = event.target.value
+        updateValueField.touched = true 
+        updateValueField.isValid = this.checkValidation(updateField[inputIdentifier].validationRule, updateValueField.value)
+        updateField[inputIdentifier] = updateValueField
+        console.log("Update Value",updateValueField)
+        formValid = updateValueField.isValid && formValid
+        console.log("Foem Valid",formValid)    
+        this.setState({orderForm:updateField, formValid:formValid})
+    }
+
+    render() {
         let formElementArray = [];
-        for(let key in this.state.orderForm){
+        for (let key in this.state.orderForm) {
             formElementArray.push({
                 id: key,
                 formConfig: this.state.orderForm[key]
             })
         }
         let genereateInputField = formElementArray.map(formElement => (
-            <Input key={formElement.id} elementType={formElement.formConfig.elementType} 
-            elementConfig={formElement.formConfig.elementConfig}
-            value={formElement.formConfig.value} />
+            <Input key={formElement.id} elementType={formElement.formConfig.elementType}
+                elementConfig={formElement.formConfig.elementConfig}
+                value={formElement.formConfig.value} 
+                inputValue={(event)=>this.inputValueHandler(event,formElement.id)}
+                inValid={!formElement.formConfig.isValid}
+                touched={formElement.formConfig.touched}/>
         ))
-        return(
+        return (
             <div className={classes.ContactData}>
                 <h4>Contact Details</h4>
-                <form>
-                    {genereateInputField}      
-                    <Button btnType="Success" clicked={this.orderHandler}>ORDER</Button>
+                <form onSubmit={this.orderHandler}>
+                    {genereateInputField}
+                    <Button btnType="Success" disabled={!this.state.formValid}>ORDER</Button>
                 </form>
             </div>
         )
