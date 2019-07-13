@@ -3,6 +3,7 @@ import classes from './ContactData.css'
 import Button from '../../../components/UI/Button/Button'
 import axios from '../../../axios-order'
 import Input from '../../../components/UI/Input/Input'
+import {connect} from 'react-redux'
 
 class ContactData extends Component {
 
@@ -82,17 +83,14 @@ class ContactData extends Component {
             }
         },
         formValid: false,
-        ingredients: null,
-        totalPrice: 0
 
     }
 
-    componentWillMount() {
-        console.log("Contact Data ", this.props)
-        let ingredients = this.props.ingredients
-        let totalPrice = this.props.totalPrice
-        this.setState({ ingredients: ingredients, totalPrice: totalPrice })
-    }
+    // componentWillMount() {
+    //     console.log("Contact Data ", this.props)
+    //     let ingredients = this.props.ing
+    //     let totalPrice = this.props.price
+    // }
 
     orderHandler = (event) => {
         event.preventDefault()
@@ -102,11 +100,11 @@ class ContactData extends Component {
             console.log("Form Value Update",formValueUpdate)
         }
         let order = {
-            ingredients: this.state.ingredients,
-            totalPrice: this.state.totalPrice,
-            orderData: formValueUpdate
-            
+            ingredients: this.props.ing,
+            totalPrice: this.props.price,
+            orderData: formValueUpdate        
          }
+         
         axios.post('/orders.json', order).then(response =>
             this.setState({ loading: false, purchasing: false }))
             .catch(error => this.setState({ loading: false, purchasing: false }))
@@ -177,4 +175,11 @@ class ContactData extends Component {
 
 }
 
-export default ContactData
+const mapStateToProps = state => {
+    return{
+        ing: state.ingredients,
+        price: state.basePrice
+    }
+}
+
+export default connect(mapStateToProps)(ContactData)
