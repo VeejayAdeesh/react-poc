@@ -8,22 +8,22 @@ import axios from '../../axios-order'
 import Spinner from '../../components/UI/Spinner/Spinner'
 import withErrorHandlers from '../../hoc/withErrorHandlers/withErrorHanlers'
 import { connect } from 'react-redux'
-import * as actionTypes from '../../store/action'
+import { addIngredient, removeIngredient, failedIngredient, initIngredient } from '../../store/actions/index'
 
 class BurgerBuilder extends Component {
 
     state = {
         purchasing: false,
         loading: false,
-        error: null
     };
 
     componentDidMount() {
-        axios.get('https://my-burger-app-af475.firebaseio.com/ingredients.json').then(response => {
-            this.setState({ ingredients: response.data })
-        }).catch(error => {
-            this.setState({ error: error })
-        })
+        // axios.get('https://my-burger-app-af475.firebaseio.com/ingredients.json').then(response => {
+        //     this.setState({ ingredients: response.data })
+        // }).catch(error => {
+        //     this.setState({ error: error })
+        // })
+        this.props.onSetIngredient()
     }
 
     purchasingHandler = () => {
@@ -76,9 +76,9 @@ class BurgerBuilder extends Component {
         }).reduce((acc, cur) => {
             return acc += cur
         }, 0)
-        return orderCount > 0 
+        return orderCount > 0
     }
-    
+
     render() {
         let orderData = null;
         if (this.state.loading) {
@@ -109,7 +109,7 @@ class BurgerBuilder extends Component {
                 continueOrder={this.purchaseableContinueHandler}
                 totalPrice={this.props.price} />
         }
-        if (this.state.error) {
+        if (this.props.error) {
             burger = <p>Unable to Load Ingredients !!!</p>
         }
         return (
@@ -126,14 +126,17 @@ class BurgerBuilder extends Component {
 const mapStateToProps = state => {
     return {
         ing: state.ingredients,
-        price: state.basePrice
+        price: state.basePrice,
+        error: state.error
     }
 }
 
 const mapDispatchToProps = dispatch => {
     return {
-        onIngredientAdd: (ingName) => dispatch({ type: actionTypes.ADD_INGREDIENT, ingredientName: ingName }),
-        onIngredientRemove: (ingName) => dispatch({ type: actionTypes.REMOVE_INGREDIENT, ingredientName: ingName })
+        onIngredientAdd: (ingName) => dispatch(addIngredient(ingName)),
+        onIngredientRemove: (ingName) => dispatch(removeIngredient(ingName)),
+        onSetIngredient: () => dispatch(initIngredient()),
+        onErrorHandler: () => dispatch(failedIngredient())
     }
 }
 
