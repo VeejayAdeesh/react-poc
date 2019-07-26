@@ -1,8 +1,8 @@
 import React, { Component } from 'react'
 import CheckOutSummary from '../../components/Order/CheckOutSummary/CheckOutSummary'
-import { Route } from 'react-router-dom'
+import { Route, Redirect } from 'react-router-dom'
 import ContactData from './ContactData/ContactData';
-import {connect} from 'react-redux'
+import { connect } from 'react-redux'
 
 
 class CheckOut extends Component {
@@ -37,26 +37,33 @@ class CheckOut extends Component {
 
 
     render() {
-        return (
-            <div>
-                <CheckOutSummary ingredients={this.props.ing}
-                    checkOutCancel={this.cancelOrder}
-                    checkOutContinue={this.continueOrder} />
-                <Route 
-                    path={this.props.match.path + '/contact-data'}
-                    component={ContactData}/>
-            </div>
+        let summary = <Redirect to="/" />
+        console.log("Summery CHeckOUt", summary)
+        if (this.props.ing) {
+            summary = (
+                < div >
+                    <CheckOutSummary ingredients={this.props.ing}
+                        checkOutCancel={this.cancelOrder}
+                        checkOutContinue={this.continueOrder} />
+                    <Route
+                        path={this.props.match.path + '/contact-data'}
+                        component={ContactData} />
+                </div >
             );
-        
+        }
+        console.log("Summery CHeckOUt", summary)
+        return summary
+
     }
-     // render={(props) => (<ContactData ingredients={this.state.ingredients} 
+    // render={(props) => (<ContactData ingredients={this.state.ingredients} 
     // totalPrice={this.state.totalPrice} {...props}/>)} />
 }
 
-const mapStateToProps = state =>{
-    return{
-        ing: state.ingredients
+
+const mapStateToProps = state => {
+    return {
+        ing: state.burgerBuilder.ingredients
     }
-    }
-    
+}
+
 export default connect(mapStateToProps)(CheckOut);
