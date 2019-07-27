@@ -37,6 +37,7 @@ const reducer = (state = initalState, action) => {
             return {
                 ...state,
                 ingredients: action.ingredient,
+                basePrice: 4,
                 error: false
             };
         case actionTypes.FAILED_INGREDIENT:

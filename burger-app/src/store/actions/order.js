@@ -22,6 +22,12 @@ const purchaseLoading = () => {
     };
 }
 
+export const purchasedRedirect = () => {
+    return {
+        type: actionTypes.PURCSHASED_REDIRECT
+    }
+}
+
 export const purchaseOrder = (orderData) => {
     return dispatch => {
         dispatch(purchaseLoading())
@@ -31,5 +37,43 @@ export const purchaseOrder = (orderData) => {
             .catch(error => {
                 dispatch(purchaseFail(error))
             })
+    };
+}
+
+export const orderFetchSuccess = (orders) => {
+    return {
+        type: actionTypes.ORDER_FETCH_SUCCESS,
+        orders: orders
+    };
+}
+
+export const orderFetchFail = (error) => {
+    return {
+        type: actionTypes.ORDER_FETCH_FAIL,
+        error: error
+    };
+}
+
+export const orderFetchLoad = () => {
+    return {
+        type: actionTypes.ORDER_FETCH_LOADING
+    }
+}
+
+export const orderFetch = () => {
+    return dispatch => {
+        dispatch(orderFetchLoad())
+        let fetchData = [];
+        axios.get('/orders.json').then(response => {
+            for (let key in response.data) {
+                fetchData.push({
+                    ...response.data[key],
+                    id: key
+                })
+            }
+            dispatch(orderFetchSuccess(fetchData))
+        }).catch(error => {
+            dispatch(orderFetchFail(error))
+        })
     };
 }

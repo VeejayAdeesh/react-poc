@@ -8,7 +8,7 @@ import axios from '../../axios-order'
 import Spinner from '../../components/UI/Spinner/Spinner'
 import withErrorHandlers from '../../hoc/withErrorHandlers/withErrorHanlers'
 import { connect } from 'react-redux'
-import { addIngredient, removeIngredient, failedIngredient, initIngredient } from '../../store/actions/index'
+import { addIngredient, removeIngredient, failedIngredient, initIngredient, purchasedRedirect } from '../../store/actions/index'
 
 class BurgerBuilder extends Component {
 
@@ -39,6 +39,7 @@ class BurgerBuilder extends Component {
 
     purchaseableContinueHandler = () => {
         console.log(this.props);
+        this.props.onPurchasedInit()
         //alert('You Continue Order!!')
         // this.setState({ loading: true })
         // let order = {
@@ -127,7 +128,8 @@ const mapStateToProps = state => {
     return {
         ing: state.burgerBuilder.ingredients,
         price: state.burgerBuilder.basePrice,
-        error: state.burgerBuilder.error
+        error: state.burgerBuilder.error,
+        purchased: state.order.purchased
     }
 }
 
@@ -136,7 +138,8 @@ const mapDispatchToProps = dispatch => {
         onIngredientAdd: (ingName) => dispatch(addIngredient(ingName)),
         onIngredientRemove: (ingName) => dispatch(removeIngredient(ingName)),
         onSetIngredient: () => dispatch(initIngredient()),
-        onErrorHandler: () => dispatch(failedIngredient())
+        onErrorHandler: () => dispatch(failedIngredient()),
+        onPurchasedInit: () => dispatch(purchasedRedirect())
     }
 }
 
