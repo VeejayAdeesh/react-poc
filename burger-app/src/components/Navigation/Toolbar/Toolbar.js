@@ -6,7 +6,7 @@ import DrawToggle from '../../Navigation/SideDrawer/DrawToggle/DrawToggle'
 
 const toolbar = (props) => (
     <header className={classes.Toolbar}>
-        <div><DrawToggle clicked={props.clickSideDraw}/></div>
+        <div><DrawToggle clicked={props.clickSideDraw} /></div>
         <div className={classes.Logo}>
             <Logo />
         </div>
