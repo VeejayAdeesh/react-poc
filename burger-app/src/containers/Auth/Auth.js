@@ -2,6 +2,8 @@ import React, { Component } from 'react'
 import Input from '../../components/UI/Input/Input'
 import Button from '../../components/UI/Button/Button'
 import classes from './Auth.css'
+import * as actionTypes from '../../store/actions/index'
+import { connect } from 'react-redux'
 
 class Auth extends Component {
 
@@ -31,13 +33,14 @@ class Auth extends Component {
                 validationRule: {
                     isRequired: true,
                     minLength: 6,
-                    maxLength: 8
+                    maxLength: 10
                 },
                 isValid: true,
                 touched: false
             }
         },
-        controlFormValid: false
+        controlFormValid: false,
+        isSignUp: false
     }
 
     checkValidation = (rules, fieldValue) => {
@@ -50,7 +53,7 @@ class Auth extends Component {
                 isValid = fieldValue.length >= 6 && isValid
             }
             if (rules.maxLength) {
-                isValid = fieldValue.length <= 8 && isValid
+                isValid = fieldValue.length <= 10 && isValid
             }
             if (rules.isEmail) {
                 const pattern = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
@@ -77,6 +80,19 @@ class Auth extends Component {
         this.setState({ controls: updateField, controlFormValid: formValid })
     }
 
+    switchSignInHandlerTrue = () => {
+        this.setState({ isSignUp: true })
+    }
+
+    switchSignInHandlerFalse = () => {
+        this.setState({ isSignUp: false })
+    }
+
+    authHanler = (event) => {
+        event.preventDefault()
+        this.props.onAuth(this.state.controls.email.value, this.state.controls.password.value, this.state.isSignUp)
+    }
+
     render() {
         let formControlArray = []
         for (let key in this.state.controls) {
@@ -94,16 +110,24 @@ class Auth extends Component {
 
         ))
         return (
-            <form>
-                <div className={classes.Controls}>
-                    {formGenerator}
-                    <Button btnType="Success">Sign In</Button>
-                </div>
-            </form>
+            <div className={classes.Controls}>
+                <form onSubmit={this.authHanler}>
+                    <div>
+                        {formGenerator}
+                        <Button btnType="Success" clicked={this.switchSignInHandlerFalse}>Sign Up</Button>
+                        <Button btnType="Danger" clicked={this.switchSignInHandlerTrue}>Sign In</Button>
+                    </div>
+                </form>
+            </div>
 
         );
     }
 
 }
 
-export default Auth
+const dispatchToProps = dispatch => {
+    return {
+        onAuth: (email, password, isSignUp) => dispatch(actionTypes.authHelper(email, password, isSignUp))
+    }
+}
+export default connect(null, dispatchToProps)(Auth)
