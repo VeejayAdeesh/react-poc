@@ -4,6 +4,7 @@ import Button from '../../components/UI/Button/Button'
 import classes from './Auth.css'
 import * as actionTypes from '../../store/actions/index'
 import { connect } from 'react-redux'
+import Spinner from '../../components/UI/Spinner/Spinner'
 
 class Auth extends Component {
 
@@ -101,16 +102,29 @@ class Auth extends Component {
                 controlForm: this.state.controls[key]
             })
         }
-        let formGenerator = formControlArray.map(formKey => (
-            <Input key={formKey.id} elementType={formKey.controlForm.elementType}
-                elementConfig={formKey.controlForm.elementConfig} value={formKey.controlForm.value}
-                inputValue={(event) => this.inputHandler(event, formKey.id)}
-                inValid={!formKey.controlForm.isValid}
-                touched={formKey.controlForm.touched} />
+        let formGenerator = null;
+        let errorMessage = null;
+        if (this.props.load) {
+            formGenerator = <Spinner />
+        }
+        else {
+            formGenerator = formControlArray.map(formKey => (
+                <Input key={formKey.id} elementType={formKey.controlForm.elementType}
+                    elementConfig={formKey.controlForm.elementConfig} value={formKey.controlForm.value}
+                    inputValue={(event) => this.inputHandler(event, formKey.id)}
+                    inValid={!formKey.controlForm.isValid}
+                    touched={formKey.controlForm.touched} />
 
-        ))
+            ))
+        }
+
+        if (this.props.error) {
+            errorMessage = (<p>{this.props.error}</p>)
+        }
+
         return (
             <div className={classes.Controls}>
+                {errorMessage}
                 <form onSubmit={this.authHanler}>
                     <div>
                         {formGenerator}
@@ -125,9 +139,16 @@ class Auth extends Component {
 
 }
 
+const stateToProps = state => {
+    return {
+        load: state.auth.loading,
+        error: state.auth.error
+    }
+}
+
 const dispatchToProps = dispatch => {
     return {
         onAuth: (email, password, isSignUp) => dispatch(actionTypes.authHelper(email, password, isSignUp))
     }
 }
-export default connect(null, dispatchToProps)(Auth)
+export default connect(stateToProps, dispatchToProps)(Auth)
